@@ -46,7 +46,7 @@ nav {
   display: flex;
   justify-content: space-around;
   padding: 1rem;
-  background-color: #ffffff;
+  background-color: #d1f2dc;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -57,7 +57,8 @@ nav a {
 }
 
 nav a:hover {
-  text-decoration: underline;
+  /* text-decoration: underline;*/
+  color:#0e3a6c;
 }
 
 .container {
@@ -73,15 +74,16 @@ input[type="file"] {
 
 button {
   padding: 0.5rem 1rem;
-  background-color: #0070f3;
-  color: white;
+  /*background-color: #0070f3;*/
+  color:#0070f3;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #005bb5;
+  /*background-color: #005bb5;*/
+  color:#0e3a6c;
 }
 
 img {
@@ -98,26 +100,3 @@ img {
   margin-top: 1rem;
 }
 
-/*:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}*/
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-/*body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}*/

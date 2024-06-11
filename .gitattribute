@@ -1,0 +1,8 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Explicitly set JS files to use LF
+*.js text eol=lf
+
+git config --global core.autocrlf input
+

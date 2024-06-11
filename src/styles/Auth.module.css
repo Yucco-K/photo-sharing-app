@@ -1,0 +1,86 @@
+.container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f0f0f0;
+}
+
+.form {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%; /* モーダル内で中央に配置されるように100%幅を設定 */
+  max-width: 400px; /* 最大幅を設定 */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+style.header {
+  margin-bottom: 10px;
+}
+
+
+.input {
+  border: none;
+  outline: none;
+}
+
+.input:focus {
+  border: none;
+  outline: none;
+}
+
+.input {
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+  transition: border-color 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border: 1px solid #007bff;
+  outline: none; 
+}
+
+.button {
+  padding: 10px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #005bb5;
+}
+
+.header{
+  text-align: center;
+}
+
+.p1{
+  color: mediumblue;
+  background-color: rgb(239, 249, 249);
+  text-align: center;
+/* text-decoration: underline;*/
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.success {
+  color: green;
+  font-size: 14px;
+  margin-top: 10px;
+}

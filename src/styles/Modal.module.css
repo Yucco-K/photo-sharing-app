@@ -1,0 +1,36 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4); /* オーバーレイの背景 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure the modal is on top of other elements */
+}
+
+.modalContent {
+  background: white; /* 白の背景 */
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+  width: 400px; /* Adjust width as needed */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 少し強めの影を追加 */
+  color: black; /* 文字色を黒に変更 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px; /* 右上に配置 */
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: black; /* 閉じるボタンの色を黒に変更 */
+}
