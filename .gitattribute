@@ -1,8 +1,10 @@
-# Auto detect text files and perform LF normalization
+# Set the default behavior to automatically normalize line endings.
 * text=auto
 
-# Explicitly set JS files to use LF
+# Force LF line endings for specific files.
 *.js text eol=lf
-
-git config --global core.autocrlf input
-
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.md text eol=lf
+*.json text eol=lf

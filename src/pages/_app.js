@@ -4,6 +4,10 @@ import { supabase } from '../lib/supabase';
 import { ModalProvider } from '../context/ModalContext';
 import '../styles/globals.css';
 
+console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log('Supabase Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+
 function App({ Component, pageProps }) {
   const [user, setUser] = useState(null);
   const router = useRouter();
