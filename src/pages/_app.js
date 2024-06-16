@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '../lib/supabase';
+import supabase from '../lib/supabase';
 import { ModalProvider } from '../context/ModalContext';
 import '../styles/globals.css';
-
-console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log('Supabase Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-
 
 function App({ Component, pageProps }) {
   const [user, setUser] = useState(null);
@@ -21,14 +17,14 @@ function App({ Component, pageProps }) {
 
       const { subscription } = supabase.auth.onAuthStateChange((_event, session) => {
         setUser(session?.user ?? null);
-        if (!session?.user) {
+        if (!session?.user && !['/signin', '/signup'].includes(router.pathname)) {
           router.push('/signin');
         }
       });
 
       authListener = subscription;
 
-      if (!session?.user) {
+      if (!session?.user && !['/signin', '/signup'].includes(router.pathname)) {
         router.push('/signin');
       }
     };

@@ -8,6 +8,7 @@
 
 # testing
 /coverage
+/scripts/testEmail.js
 
 # next.js
 /.next/
@@ -27,6 +28,9 @@ yarn-error.log*
 
 # local env files
 .env*.local
+
+# .env file
+.env
 
 # vercel
 .vercel

@@ -1,32 +1,32 @@
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useModal } from '../context/ModalContext';
-import { supabase } from '../lib/supabase';
+import styles from '../styles/NavBar.module.css';
+import supabase from '../lib/supabase'; // Supabaseクライアントをインポート
 
-export default function NavBar({ user }) {
-  const { openModal } = useModal();
+export default function NavBar() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/signin');
+    try {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error('Logout failed:', error.message);
+        return;
+      }
+
+      // ローカルセッションのクリア
+      localStorage.removeItem('user'); // 必要に応じてセッション情報をクリア
+      router.push('/signin'); // ログインページにリダイレクト
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   return (
-    <nav>
-      <Link href="/">Home</Link>
-      {user ? (
-        <>
-          <button onClick={handleLogout}>Logout</button>
-          <button onClick={() => openModal('upload')}>Upload</button>
-        </>
-      ) : (
-        <>
-          <Link href="/signin">Sign In</Link>
-          <Link href="/signup">Sign Up</Link>
-        </>
-      )}
+    <nav className={styles.navbar}>
+      <div className={styles.navbarBrand}>MyApp</div>
+      <button onClick={handleLogout} className={styles.logoutButton}>ログアウト</button>
     </nav>
   );
 }
