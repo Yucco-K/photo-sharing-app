@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 async function signIn(email, password) {
   try {
-    const response = await fetch('/api/signInUser', {
+    const response = await fetch('/api/signinUser', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,6 +60,7 @@ export default function SignIn() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <input
           className={styles.input}
@@ -67,6 +68,7 @@ export default function SignIn() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button type="submit" className={styles.button}>ログイン</button>
         <p className={styles.p1}>

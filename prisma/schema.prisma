@@ -8,7 +8,7 @@ generator client {
 }
 
 model Photo {
-  id        String   @id @default(uuid())
+  id        String   @id
   url       String
   title     String
   comment   String?

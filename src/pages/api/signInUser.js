@@ -1,33 +1,47 @@
+import jwt from 'jsonwebtoken';
+
+const SECRET_KEY = process.env.JWT_SECRET_KEY; // 秘密鍵は環境変数に保存します
+
+// /pages/api/signin.js
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { createClient } from '@supabase/supabase-js';
 
 const prisma = new PrismaClient();
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { email, password } = req.body;
+
     try {
-      const user = await prisma.user.findUnique({
-        where: { email },
+      // Supabaseで認証
+      const { data: { user }, error: signinError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      if (!user) {
+      if (signinError) {
         return res.status(401).json({ error: 'Invalid login credentials' });
       }
 
-      let isPasswordValid;
-      try {
-        isPasswordValid = bcrypt.compareSync(password, user.password);
-      } catch (syncError) {
-        isPasswordValid = await bcrypt.compare(password, user.password);
-      }
+      // Prismaで追加のユーザーデータを取得
+      const prismaUser = await prisma.user.findUnique({
+        where: { id: user.id },
+      });
 
-      if (!isPasswordValid) {
+      if (!prismaUser) {
         return res.status(401).json({ error: 'Invalid login credentials' });
       }
 
-      // 認証が成功した場合の処理 (例えば、JWT トークンの生成)
-      res.status(200).json({ user });
+      // JWTトークンの生成
+      const token = jwt.sign(
+        { userId: prismaUser.id },
+        SECRET_KEY,
+        { expiresIn: '1h' } // トークンの有効期限を1時間に設定
+      );
+
+      // 認証が成功した場合の処理 (JWTトークンの返却)
+      res.status(200).json({ user: prismaUser, token });
     } catch (error) {
       console.error('Error signing in:', error);
       res.status(500).json({ error: 'Failed to sign in' });

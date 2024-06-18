@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 async function signUp(email, password, name, nickname) {
   try {
-    const response = await fetch('/api/signupUsers', {
+    const response = await fetch('/api/signupUser', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,12 +41,13 @@ export default function SignUp() {
       return;
     }
 
-    const { error } = await signUp(email, password, name, nickname);
+    const { data, error } = await signUp(email, password, name, nickname);
 
     if (error) {
       setError('アカウント作成に失敗しました: ' + error.message);
     } else {
       setError(null);
+      console.log('User ID:', data.id); // サインアップ成功後にユーザーIDをログ
       router.push('/signin'); // サインアップ成功後にサインインページにリダイレクト
     }
   };
