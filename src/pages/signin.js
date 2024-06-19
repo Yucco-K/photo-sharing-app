@@ -2,28 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import styles from '../styles/Auth.module.css';
 import Link from 'next/link';
-
-async function signIn(email, password) {
-  try {
-    const response = await fetch('/api/signinUser', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || 'Failed to sign in');
-    }
-
-    return { data };
-  } catch (error) {
-    console.error('Error signing in:', error.message);
-    return { error };
-  }
-}
+import { handleSignInRequest } from '../lib/api'; // インポート
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -39,7 +18,7 @@ export default function SignIn() {
       return;
     }
 
-    const { error } = await signIn(email, password);
+    const { error } = await handleSignInRequest(email, password);
 
     if (error) {
       setError('ログインに失敗しました: ' + error.message);

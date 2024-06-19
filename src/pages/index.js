@@ -1,39 +1,53 @@
+// pages/index.js
 import React, { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import Modal from '../components/Modal';
 import Upload from './upload';
 import { useModal } from '../context/ModalContext';
-import prisma from '../lib/prisma';
 import Image from 'next/image';
+import { fetchPhotos } from '../lib/photos';
+import DeleteUserComponent from '../components/DeleteUserComponent';
+import { getSession } from '../lib/supabase';
 
-export async function getServerSideProps() {
-  try {
-    const photos = await prisma.photo.findMany({
-      include: {
-        user: {
-          select: {
-            email: true,
-          },
-        },
-      },
-    });
+export async function getServerSideProps(context) {
+  const { req } = context;
+  const session = await getSession(req); // セッション情報を取得
+
+  if (!session) {
     return {
-      props: {
-        initialPhotos: photos,
-      },
-    };
-  } catch (error) {
-    console.error('Error fetching photos:', error);
-    return {
-      props: {
-        initialPhotos: [],
-        error: 'Error fetching photos'
+      redirect: {
+        destination: '/signin', // ログインしていない場合はサインインページにリダイレクト
+        permanent: false,
       },
     };
   }
+
+  const { user } = session;
+
+  // ここでユーザーの役割を取得して判定
+  const isAdmin = user.role === 'admin';
+
+  let photos = [];
+  let error = null;
+
+  try {
+    photos = await fetchPhotos();
+  } catch (err) {
+    console.error('Error fetching photos:', err);
+    error = 'Error fetching photos';
+  }
+
+  return {
+    props: {
+      user,
+      isAdmin,
+      initialPhotos: photos,
+      error,
+    },
+  };
 }
 
-export default function Home({ user, initialPhotos }) {
+export default function Home({ user, isAdmin, initialPhotos, error }) {
   const [photos, setPhotos] = useState(initialPhotos);
   const { modalType, closeModal } = useModal();
 
@@ -56,14 +70,14 @@ export default function Home({ user, initialPhotos }) {
     const response = await fetch('/api/sendEmail', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         to: 'recipient@example.com',
         subject: 'New Photos Uploaded',
         text: 'New photos have been uploaded.',
-        html: '<p>New photos have been uploaded.</p>'
-      })
+        html: '<p>New photos have been uploaded.</p>',
+      }),
     });
 
     if (response.ok) {
@@ -88,10 +102,11 @@ export default function Home({ user, initialPhotos }) {
             <Image src={photo.url} alt={`Photo ${index}`} width={300} height={300} />
             <p>{photo.title}</p>
             <p>{photo.comment}</p>
-            <p>Uploaded by: {photo.user.email}</p>
+            <p>Uploaded by: {photo.user.name}</p>
           </div>
         ))
       )}
+      {isAdmin && <DeleteUserComponent />}
     </div>
   );
 }

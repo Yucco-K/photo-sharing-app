@@ -13,7 +13,23 @@ export default function Signout() {
     };
 
     signOutUser();
+
+    // Perform any necessary cleanup here
+    return () => {
+      // Cleanup code goes here
+      // For example, you can unsubscribe from any subscriptions or clear timers
+      // that were set up in the useEffect hook
+
+      // Unsubscribe from any subscriptions
+      // subscription.unsubscribe();
+
+      // Clear any timers
+      // clearTimeout(timer);
+      subscription.unsubscribe()
+    };
   }, [router]);
 
-  return <div>Signing out...</div>;
+  return (
+    <div>Signing out...</div>
+  );
 }

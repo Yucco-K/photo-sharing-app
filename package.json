@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "test-email": "node scripts/testEmail.js",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "type": "module",
+    "test": "jest"
   },
   "dependencies": {
     "@prisma/client": "^5.15.0",
@@ -19,14 +21,20 @@
     "mini-css-extract-plugin": "^2.9.0",
     "next": "^14.2.3",
     "nodemailer": "^6.9.13",
+    "nodemailer-ses-transport": "^1.5.1",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/preset-react": "^7.24.7",
+    "@babel/preset-typescript": "^7.24.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.19",
+    "babel-jest": "^29.7.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8.4.38",

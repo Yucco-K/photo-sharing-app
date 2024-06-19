@@ -1,11 +1,10 @@
+// pages/api/signinUser.js
+
 import jwt from 'jsonwebtoken';
-
-const SECRET_KEY = process.env.JWT_SECRET_KEY; // 秘密鍵は環境変数に保存します
-
-// /pages/api/signin.js
 import { PrismaClient } from '@prisma/client';
 import { createClient } from '@supabase/supabase-js';
 
+const SECRET_KEY = process.env.JWT_SECRET_KEY; // 秘密鍵は環境変数に保存します
 const prisma = new PrismaClient();
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
