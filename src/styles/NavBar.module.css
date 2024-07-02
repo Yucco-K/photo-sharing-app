@@ -1,3 +1,4 @@
+/*NavBar.module.css*/
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -24,3 +25,31 @@
 .logoutButton:hover {
   background-color: #d32f2f;
 }
+
+.loinButton {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.loginButton:hover {
+  background-color: #d32f2f;
+}
+
+.uploadButton {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.uploadButton:hover {
+  background-color: #d32f2f;
+}
+

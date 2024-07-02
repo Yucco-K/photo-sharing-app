@@ -1,3 +1,4 @@
+/*Auth.module.css*/
 .container {
   width: 100%;
   display: flex;
@@ -70,7 +71,7 @@ style.header {
   color: mediumblue;
   background-color: rgb(239, 249, 249);
   text-align: center;
-/* text-decoration: underline;*/
+  text-decoration: underline;
 }
 
 .error {

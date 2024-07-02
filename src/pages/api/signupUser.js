@@ -29,7 +29,7 @@ export default async function handler(req, res) {
       // PrismaでUserテーブルにユーザー情報を追加
       const prismaUser = await prisma.user.create({
         data: {
-          id: user.id, // SupabaseのユーザーIDを使用
+          id: user.user_id, // SupabaseのユーザーIDを使用
           email,
           password: bcrypt.hashSync(password, 10), // パスワードをハッシュ化
           name,

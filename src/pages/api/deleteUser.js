@@ -1,30 +1,28 @@
-// pages/api/deleteUser.js
-import { createClient } from '@supabase/supabase-js';
-
-// Supabase クライアントの作成
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY // サービスロールキーが必要です
-);
+import supabase from '../../lib/supabase';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { userId } = req.body;
+    const { email } = req.body;
 
     try {
-      const { error } = await supabase.auth.admin.deleteUser(userId);
+      // Supabaseでのマジックリンク送信
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: 'http://localhost:3000/welcome', // リダイレクト先を設定
+        },
+      });
+
       if (error) {
-        console.error('Error deleting user:', error.message);
-        return res.status(500).json({ error: error.message });
-      } else {
-        console.log('User deleted successfully');
-        return res.status(200).json({ message: 'User deleted successfully' });
+        throw new Error(error.message || 'Error sending magic link in Supabase');
       }
+
+      res.status(200).json({ message: 'Magic link sent successfully' });
     } catch (error) {
-      console.error('Error deleting user:', error);
-      return res.status(500).json({ error: 'Failed to delete user' });
+      res.status(500).json({ error: 'Error sending magic link', details: error.message });
     }
   } else {
     res.status(405).json({ error: 'Method not allowed' });
   }
 }
+//

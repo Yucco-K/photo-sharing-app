@@ -1,19 +1,18 @@
 // pages/api/signinUser.js
 
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../lib/supabase';
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY; // 秘密鍵は環境変数に保存します
 const prisma = new PrismaClient();
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { email, password } = req.body;
 
     try {
-      // Supabaseで認証
+      // Supabaseで認証 (Supabaseのauth.usersテーブルに格納されているユーザー情報を使って、ユーザーの認証を行う。)
       const { data: { user }, error: signinError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -23,16 +22,17 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Invalid login credentials' });
       }
 
-      // Prismaで追加のユーザーデータを取得
+      // Prismaで追加のユーザーデータを取得（アプリケーション固有のユーザー情報（例: ユーザープロファイル、設定など）がPrismaのuserテーブルに格納されている。
+      //これにより、Supabaseの認証に成功したユーザーがアプリケーションでも有効なユーザーであることを確認する）
       const prismaUser = await prisma.user.findUnique({
-        where: { id: user.id },
+        where: { id: user.user_id },
       });
 
       if (!prismaUser) {
         return res.status(401).json({ error: 'Invalid login credentials' });
       }
 
-      // JWTトークンの生成
+      // JWTトークンの生成(クライアントがAPIリクエストを行う際に、トークンを使用してユーザーが認証されていることをサーバーに証明する。)
       const token = jwt.sign(
         { userId: prismaUser.id },
         SECRET_KEY,

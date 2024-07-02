@@ -1,22 +1,28 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-export default function DeleteUserComponent() {
+const DeleteUserComponent = () => {
   const [userId, setUserId] = useState('');
 
   const handleDeleteUser = async () => {
-    const response = await fetch('/api/deleteUser', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId }), // userIdをJSON文字列に変換して送信
-    });
+    try {
+      const response = await fetch('/api/deleteUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
 
-    const data = await response.json();
-    if (response.ok) {
-      console.log('User deleted successfully:', data.message);
-    } else {
-      console.error('Failed to delete user:', data.error);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
+
+      const data = await response.json();
+      alert('User deleted successfully');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert(`Error deleting user: ${error.message}`);
     }
   };
 
@@ -24,12 +30,14 @@ export default function DeleteUserComponent() {
     <div>
       <input
         type="text"
-        placeholder="User ID"
         value={userId}
         onChange={(e) => setUserId(e.target.value)}
+        placeholder="User ID"
       />
       <button onClick={handleDeleteUser}>Delete User</button>
     </div>
   );
-}
+};
+
+export default DeleteUserComponent;
 // Compare this snippet from src/pages/index.js:

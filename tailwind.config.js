@@ -1,8 +1,10 @@
 module.exports = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx}",// pagesディレクトリ内の全てのJavaScriptとTypeScriptファイル
-    "./components/**/*.{js,ts,jsx,tsx}",// componentsディレクトリ内の全てのJavaScriptとTypeScriptファイル
-    "./context/**/*.{js,ts,jsx,tsx}", // contextディレクトリ内の全てのJavaScriptとTypeScriptファイル
+    './src/pages/**/*.{js,ts,jsx,tsx,mjs}', // .mjsを含める
+    './src/components/**/*.{js,ts,jsx,tsx,mjs}',
+    './src/app/**/*.{js,ts,jsx,tsx,mjs}', // 必要であれば
+    './src/lib/**/*.{js,ts,jsx,tsx,mjs}', // libディレクトリを追加
+    './src/scripts/**/*.{js,ts,jsx,tsx,mjs}', // scriptsディレクトリを追加
   ],
   theme: {
     extend: {},

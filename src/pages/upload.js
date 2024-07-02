@@ -6,24 +6,30 @@ import styles from '../styles/Upload.module.css';
 import Image from 'next/image';
 
 export default function Upload() {
-  const { modalType, closeModal, setUploadedImageUrl } = useModal();
+  const { modalType, closeModal } = useModal();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
   const [uploadStatus, setUploadStatus] = useState(''); // アップロードのステータス
-  const [user, setUser] = useState(null);
+
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
+      setLoading(true);
+      const { data, error } = await supabase.auth.getUser(); // カレントユーザー情報を取得
       if (error) {
+        setError(error.message);
         console.error('Error fetching user:', error.message);
       } else {
         setUser(data.user);
       }
+      setLoading(false);
     };
-
+  
     fetchUser();
   }, []);
 
@@ -31,13 +37,13 @@ export default function Upload() {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       // ファイルの種類とサイズをチェック
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm', 'video/ogg'];
       if (!allowedTypes.includes(selectedFile.type)) {
-        setUploadStatus('Only JPG, PNG, and GIF files are allowed.');
+        setUploadStatus('Only JPG, PNG, GIF, MP4, WEBM, and OGG files are allowed.');
         return;
       }
-      if (selectedFile.size > 5 * 1024 * 1024) { // 5MB制限
-        setUploadStatus('File size should be less than 5MB.');
+      if (selectedFile.size > 50 * 1024 * 1024) { // 50MB制限
+        setUploadStatus('File size should be less than 50MB.');
         return;
       }
 
@@ -87,27 +93,20 @@ export default function Upload() {
     const finalURL = publicURL ? `${publicURL}?t=${new Date().getTime()}` : null;
     console.log('Final URL:', finalURL);
 
-    const response = await fetch('/api/createPhoto', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: finalURL,
-        title,
-        comment,
-        userId: user.id,
-      }),
+    // RPC関数(create_photo)を呼び出してデータを挿入
+    const { data: rpcData, error: rpcError } = await supabase.rpc('create_photo', {
+      url: finalURL,
+      title,
+      comment,
+      user_id: user.user_id // フィールド名をuser_idに変更
     });
 
-    const responseData = await response.json();
-    if (!response.ok) {
-      console.log('Error creating photo:', responseData.error);
-      setUploadStatus(`Error creating photo: ${responseData.error}`);
+    if (rpcError) {
+      console.log('Error creating photo:', rpcError.message);
+      setUploadStatus(`Error creating photo: ${rpcError.message}`);
       return;
     }
 
-    setUploadedImageUrl(finalURL);
     setFile(null);
     setPreviewUrl(null);
     setTitle(''); // タイトルをリセット
@@ -141,7 +140,16 @@ export default function Upload() {
           className={styles.input}
         />
         {previewUrl && (
-          <Image src={previewUrl} alt="Preview" layout="intrinsic" width={300} height={300} />
+          <>
+            {file.type.startsWith('image/') ? (
+              <Image src={previewUrl} alt="Preview" layout="intrinsic" width={300} height={300} />
+            ) : (
+              <video controls width="300">
+                <source src={previewUrl} type={file.type} />
+                Your browser does not support the video tag.
+              </video>
+            )}
+          </>
         )}
         <button onClick={handleUpload} className={styles.button}>Upload</button>
         {uploadStatus && <p>{uploadStatus}</p>}
@@ -149,3 +157,4 @@ export default function Upload() {
     </Modal>
   );
 }
+// Compare this snippet from src/pages/upload.js:

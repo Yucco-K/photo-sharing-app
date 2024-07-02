@@ -1,20 +1,25 @@
-// lib/supabase.js
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceRoleKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
+if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
   throw new Error('Supabase URL またはキーが設定されていません。');
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   schema: 'public',
-  ssl: { rejectUnauthorized: false } // SSLオプションの設定
+  ssl: { rejectUnauthorized: false }
+});
+
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
+  schema: 'public',
+  ssl: { rejectUnauthorized: false }
 });
 
 export const getSession = async (req) => {
-  const token = req.headers.cookie?.split('=')[1]; // クッキーからトークンを取得
+  const token = req.headers.cookie?.split('=')[1];
 
   if (!token) {
     return null;
@@ -32,14 +37,30 @@ export const getSession = async (req) => {
     return null;
   }
 
-  // ユーザーの役割を含む情報を返す
   return {
     user: {
-      id: user.id,
+      id: user.user_id,
       email: user.email,
-      role: user.user_metadata.role, // 役割情報を含める
+      role: user.role,
     },
   };
 };
 
+export const deleteUser = async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete user: ' + error.message });
+  }
+};
+
 export default supabase;
+export { supabaseAdmin };

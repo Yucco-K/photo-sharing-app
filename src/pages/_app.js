@@ -12,11 +12,16 @@ function App({ Component, pageProps }) {
     let authListener;
 
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      console.log('Session:', session); // デバッグ用ログ
       setUser(session?.user ?? null);
 
-      const { subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+        console.log('Auth state changed:', session); // デバッグ用ログ
         setUser(session?.user ?? null);
+
+        // ユーザーが認証されていない場合、サインインページにリダイレクト
         if (!session?.user && !['/signin', '/signup'].includes(router.pathname)) {
           router.push('/signin');
         }
@@ -24,6 +29,7 @@ function App({ Component, pageProps }) {
 
       authListener = subscription;
 
+      // 初回セッションチェック時もリダイレクト処理を実行
       if (!session?.user && !['/signin', '/signup'].includes(router.pathname)) {
         router.push('/signin');
       }
@@ -32,9 +38,9 @@ function App({ Component, pageProps }) {
     getSession();
 
     return () => {
-      authListener?.unsubscribe();
+      authListener?.subscription?.unsubscribe();
     };
-  }, [router]);
+  }, [router]); // 依存関係配列にrouterを追加
 
   return (
     <ModalProvider>

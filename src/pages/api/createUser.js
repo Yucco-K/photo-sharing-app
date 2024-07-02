@@ -1,32 +1,41 @@
-// pages/api/createUser.js
-import prisma from '../../lib/prisma';
 import supabase from '../../lib/supabase';
+import prisma from '../../lib/prisma';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { email, password, name, bio, avatarUrl } = req.body;
+    const { email, password, name, nickname, role } = req.body;
+
+    if (!email || !password || !name || !nickname || !role) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
     try {
       // Supabaseでのユーザー作成
       const { data, error } = await supabase.auth.signUp({ email, password });
 
       if (error) {
-        return res.status(500).json({ error: 'Error creating user in Supabase' });
+        console.error('Supabase sign up error:', error.message); // ログにエラーメッセージを記録
+        return res.status(400).json({ error: 'Error creating user in Supabase', details: error.message });
       }
 
-      const userId = data.user.id;
+      const userId = data.user.user_id; // Supabaseから取得したユーザーID
 
-      // プロフィールの作成
-      const profile = await prisma.profile.create({
+      // Prismaでのユーザー作成
+      const newUser = await prisma.user.create({
         data: {
-          userId,
-          bio: bio || null,
-          avatarUrl: avatarUrl || null,
+          user_id: userId, // SupabaseのユーザーIDをPrismaのユーザーIDとして設定
+          email,
+          password, // これはハッシュ化されたパスワードを使用することをお勧めします
+          name,
+          nickname,
+          role,
         },
       });
 
-      res.status(200).json({ user: data.user, profile });
+      res.status(200).json({ user: newUser });
     } catch (error) {
-      res.status(500).json({ error: 'Error creating user' });
+      console.error('Prisma create user error:', error.message); // ログにエラーメッセージを記録
+      res.status(500).json({ error: 'Error creating user', details: error.message });
     }
   } else {
     res.status(405).json({ error: 'Method not allowed' });

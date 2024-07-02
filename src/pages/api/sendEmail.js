@@ -1,46 +1,33 @@
+// pages/api/sendEmail.js
 import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.status(200).end();
-    return;
-  }
-
   if (req.method === 'POST') {
     const { to, subject, text, html } = req.body;
 
-    // SMTP認証情報を設定
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPassword = process.env.SMTP_PASS;
-
-    const transporter = nodemailer.createTransport({
-      host: 'email-smtp.ap-northeast-3.amazonaws.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: smtpUser,
-        pass: smtpPassword,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.AWS_SES_FROM_EMAIL, // 環境変数から取得
-      to: to,
-      subject: subject,
-      text: text,
-      html: html,
-    };
-
     try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log('Message sent: %s', info.messageId);
+      const transporter = nodemailer.createTransport({
+        host: process.env.AWS_SES_HOST,
+        port: 587,
+        auth: {
+          user: process.env.AWS_SES_USER,
+          pass: process.env.AWS_SES_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: 'noreply@yu-cco.com',//process.env.AWS_SES_FROM_EMAIL,
+        to:'recipient@yu-cco.com',
+        subject,
+        text,
+        html,
+      };
+
+      await transporter.sendMail(mailOptions);
       res.status(200).json({ message: 'Email sent successfully' });
     } catch (error) {
-      console.error('Error sending email: ', error);
-      res.status(500).json({ error: 'Error sending email' });
+      console.error('Error sending email:', error);
+      res.status(500).json({ error: 'Failed to send email' });
     }
   } else {
     res.status(405).json({ error: 'Method not allowed' });
